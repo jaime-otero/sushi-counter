@@ -607,6 +607,9 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
   align-items: center;
   border-bottom: 1px solid var(--line);
   min-width: 0;
+  /* Solo se dibujan los platos que están en pantalla: cada toque va más rápido. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 66px;
 }
 .dish-main {
   display: flex;
@@ -639,9 +642,12 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 .has-note { font-size: 12px; color: var(--kin); font-weight: 600; }
 
 .dish-side { display: flex; align-items: center; gap: 2px; }
-.plus { width: 34px; height: 34px; display: grid; place-items: center; color: var(--ink-3); }
-.plus .ic { width: 18px; height: 18px; }
+.plus { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink-3); border: 0; background: none; padding: 0; }
+.plus .ic { width: 20px; height: 20px; }
+.plus:active { color: var(--beni); }
 .count {
+  border: 0;
+  margin: 0 5px;
   min-width: 34px;
   height: 34px;
   padding: 0 6px;
@@ -686,9 +692,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
   grid-template-columns: 1fr 1.4fr;
   gap: 10px;
   padding: 10px var(--gutter-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gutter-l);
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
+  background: var(--paper);
   border-top: 1px solid var(--line);
 }
 
@@ -794,9 +798,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-  background: color-mix(in srgb, var(--paper) 86%, transparent);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
+  background: var(--paper);
   border-top: 1px solid var(--line);
 }
 .no-tabbar .tabbar { display: none; }

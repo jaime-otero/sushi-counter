@@ -45,7 +45,7 @@ function toLocalInput(ts) {
 const D = () => db.data;
 const N = () => db.data.names;
 const ui = {
-  mealId: null, filter: 'todo', query: '',
+  mealId: null, filter: 'todo', query: '', stats: null,
   likesRid: null, likesSeg: 'top', likesQuery: '',
   histRid: 'all', menuQuery: '', showHidden: false,
   justFinished: null,
@@ -56,9 +56,9 @@ function save() {
   clearTimeout(saveTimer);
   if (!db.save()) toast('No se ha podido guardar. Revisa el espacio del iPhone.');
 }
-function saveSoon() {
+function saveSoon(ms = 400) {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(save, 400);
+  saveTimer = setTimeout(save, ms);
 }
 
 const rest = (id) => D().restaurants.find((r) => r.id === id);
@@ -433,6 +433,7 @@ function searchScore(d, q) {
 function listHTML(m, r) {
   const c = counts(m);
   const stats = dishStats(r.id);
+  ui.stats = stats;
   const q = norm(ui.query.trim());
   const f = ui.filter;
   let dishes = r.dishes.filter((d) => !d.archived || c[d.id]);
@@ -486,7 +487,7 @@ function dishRowHTML(m, r, d, c, s, withRating) {
       <span class="dish-text"><span class="dish-name">${esc(d.name)}</span>${dishMeta(d, s)}${splitHTML(c)}</span>
     </button>
     <div class="dish-side">
-      ${n ? `<button class="minus" data-act="remove" data-id="${d.id}" aria-label="Quitar uno de ${esc(d.name)}">${icon('minus')}</button><span class="count">${n}</span>` : `<span class="plus" aria-hidden="true">${icon('plus')}</span>`}
+      ${n ? `<button class="minus" data-act="remove" data-id="${d.id}" aria-label="Quitar uno de ${esc(d.name)}">${icon('minus')}</button><button class="count" data-act="add" data-id="${d.id}" aria-label="Sumar otro ${esc(d.name)}">${n}</button>` : `<button class="plus" data-act="add" data-id="${d.id}" aria-label="Sumar ${esc(d.name)}">${icon('plus')}</button>`}
       <button class="info" data-act="dish" data-rid="${r.id}" data-id="${d.id}" data-mid="${m.id}" aria-label="Ficha de ${esc(d.name)}">${icon('info')}</button>
     </div>
     ${withRating ? `<div class="dish-rate">${rateLine('dish', m, 'a', d.id)}${rateLine('dish', m, 'b', d.id)}</div>` : ''}
@@ -543,7 +544,7 @@ function updateCounter(m, did, bump = false) {
   const d = dishOf(r, did);
   if (d) {
     const c = counts(m)[did];
-    const s = dishStats(r.id).get(did);
+    const s = (ui.stats || dishStats(r.id)).get(did);
     $$(`.dish[data-dish="${CSS.escape(did)}"]`).forEach((el) => {
       el.outerHTML = dishRowHTML(m, r, d, c, s, ui.filter === 'pedido');
     });
@@ -1120,8 +1121,8 @@ function addDish(mid, did, w) {
   if (!m) return;
   const entry = { d: did, w: w || m.who || 's', r: m.round, t: Date.now() };
   m.log.push(entry);
-  save();
   updateCounter(m, did, true);
+  saveSoon(250);
   const d = dishOf(rest(m.rid), did);
   toast(`<b>+1</b> ${esc(d?.name || '')} <span class="toast-who">${esc(whoName(entry.w))}</span>`, {
     label: 'Deshacer',
@@ -1141,8 +1142,8 @@ function removeDish(mid, did) {
   for (let k = m.log.length - 1; k >= 0 && i < 0; k--) if (m.log[k].d === did) i = k;
   if (i < 0) return;
   m.log.splice(i, 1);
-  save();
   updateCounter(m, did);
+  saveSoon(250);
 }
 
 function refresh() {
