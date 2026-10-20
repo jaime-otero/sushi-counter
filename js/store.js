@@ -1,5 +1,5 @@
 // Persistencia local (localStorage) + copia de seguridad en JSON.
-import { seedRestaurants, buildSushiTokyo, SEED_ID } from './seed.js';
+import { seedRestaurants, buildSushiTokyo, SEED_ID, SEED_VERSION } from './seed.js';
 
 const KEY = 'sushi-counter/v1';
 const VERSION = 1;
@@ -30,6 +30,14 @@ function migrate(d) {
     m.rating ??= { a: 0, b: 0 };
     m.round ??= 1;
   });
+  // Actualiza tarifas y normas de la carta precargada sin tocar platos ni notas.
+  const st = d.restaurants.find((r) => r.id === SEED_ID);
+  if (st && (st.seed?.version ?? 1) < SEED_VERSION) {
+    const seed = buildSushiTokyo();
+    st.prices = seed.prices;
+    st.notes = seed.notes;
+    st.seed = seed.seed;
+  }
   return d;
 }
 

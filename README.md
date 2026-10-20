@@ -34,7 +34,7 @@ Todo se guarda en el propio iPhone (no hay servidor ni cuentas). En **Ajustes** 
 
 Sacada de la carta digital oficial enlazada desde [sushitokyoprincipepio.com](https://sushitokyoprincipepio.com/) (menú de noche, consultada el 20/10/2026).
 
-- Menú Infinity: mediodía laborables 16,80 €, noches laborables 22,90 €, noches de viernes a domingo y festivos 24,90 € por adulto. Bebida y postre aparte, mínimo una bebida por persona.
+- Menú Infinity (cartel del local, octubre 2026): mediodía de lunes a viernes 17,80 €, cena de lunes a jueves 23,90 €, fin de semana (viernes noche a domingo, festivos y vísperas) 25,90 € por adulto. Bebida y postre aparte, mínimo una bebida por persona.
 - Máximo 4 platos por persona y ronda; 5 € de penalización por plato que no se consuma.
 - Las piezas de la Barca (18) y del Sushi mixto (16) son una estimación a partir de la descripción de la carta. Se pueden editar desde la carta del restaurante.
 

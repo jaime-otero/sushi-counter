@@ -3,7 +3,7 @@
 // (to-focus.com/restaurant_menu/sushitokyo_principe_menu, menú noche), consultada el 20/10/2026.
 
 export const SEED_ID = 'sushitokyo-principe-pio';
-export const SEED_VERSION = 1;
+export const SEED_VERSION = 2;
 
 const CATEGORIES = [
   ['entrantes', 'Entrantes y dim sum', '前菜', false],
@@ -239,12 +239,12 @@ export function buildSushiTokyo() {
     place: 'C.C. Príncipe Pío · Paseo de la Florida, 2, Madrid',
     phone: '910 857 741',
     hours: 'Todos los días 13:00–16:30 y 20:00–00:00',
-    notes: 'Menú Infinity (a la carta ilimitado): máximo 4 platos por persona y ronda, sin límite de rondas. 5 € por cada plato que no se consuma. Bebida y postre aparte (mínimo 1 bebida por persona). Al mediodía algunos suplementos cambian.',
+    notes: 'Menú Infinity (a la carta ilimitado): máximo 4 platos por persona y ronda, sin límite de rondas. 5 € por cada plato que no se consuma. Bebida y postre aparte (mínimo 1 bebida por persona). Al mediodía algunos suplementos cambian.\n\nTarifas (cartel del local): mediodía de lunes a viernes no festivos 17,80 €; cena de lunes a jueves no festivos ni vísperas 23,90 €; fin de semana (viernes noche a domingo, festivos y vísperas) 25,90 €. Niños: menos de 0,95 m gratis, menos de 1,30 m 9,50 €, menos de 1,50 m 13,95 €.',
     maxPerRound: 4,
     prices: [
-      { id: 'mediodia', label: 'Mediodía laborables', eur: 16.8, when: 'lunch-weekday' },
-      { id: 'noche', label: 'Noche laborables', eur: 22.9, when: 'dinner-weekday' },
-      { id: 'finde', label: 'Noche V–D y festivos', eur: 24.9, when: 'weekend' },
+      { id: 'mediodia', label: 'Mediodía L–V', eur: 17.8, when: 'lunch-weekday' },
+      { id: 'noche', label: 'Cena L–J', eur: 23.9, when: 'dinner-weekday' },
+      { id: 'finde', label: 'Fin de semana', eur: 25.9, when: 'weekend' },
     ],
     source: 'Carta oficial (to-focus.com), consultada el 20/10/2026',
     categories,

@@ -1,6 +1,6 @@
 // Service worker: la app funciona sin cobertura (útil en el sótano del centro comercial).
 // Sube la versión cuando cambien los archivos para que el iPhone descargue la nueva.
-const CACHE = 'sushi-counter-v1';
+const CACHE = 'sushi-counter-v2';
 const ASSETS = [
   './',
   './index.html',
