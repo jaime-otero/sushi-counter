@@ -1,5 +1,5 @@
 // Persistencia local (localStorage) + copia de seguridad en JSON.
-import { seedRestaurants, buildSushiTokyo, SEED_ID, SEED_VERSION } from './seed.js';
+import { seedRestaurants, buildSushiTokyo, BUILTINS, SEED_ID, SEED_VERSION } from './seed.js';
 
 const KEY = 'sushi-counter/v1';
 const VERSION = 1;
@@ -12,6 +12,7 @@ function fresh() {
     names: { a: 'Yo', b: 'Mi novia' },
     onboarded: false,
     restaurants: seedRestaurants(),
+    seeds: Object.keys(BUILTINS),
     meals: [],
     activeMealId: null,
     createdAt: Date.now(),
@@ -37,6 +38,13 @@ function migrate(d) {
     st.prices = seed.prices;
     st.notes = seed.notes;
     st.seed = seed.seed;
+  }
+  // Añade las cartas nuevas que traiga la app (solo una vez: si se borran, no vuelven solas).
+  d.seeds ??= [SEED_ID];
+  for (const [id, build] of Object.entries(BUILTINS)) {
+    if (d.seeds.includes(id)) continue;
+    if (!d.restaurants.some((r) => r.id === id)) d.restaurants.push(build());
+    d.seeds.push(id);
   }
   return d;
 }
@@ -81,13 +89,17 @@ export const db = {
     this.save();
   },
 
-  // Vuelve a añadir la carta de Sushitokyo si se borró, o actualiza la carta
+  // Vuelve a añadir las cartas que vienen con la app si se borraron, o las actualiza
   // manteniendo notas personales y platos añadidos a mano.
-  restoreSeed() {
-    const seed = buildSushiTokyo();
-    const current = this.data.restaurants.find((r) => r.id === SEED_ID);
+  restoreSeeds() {
+    Object.values(BUILTINS).forEach((build) => this.restoreSeed(build()));
+    this.save();
+  },
+
+  restoreSeed(seed) {
+    const current = this.data.restaurants.find((r) => r.id === seed.id);
     if (!current) {
-      this.data.restaurants.unshift(seed);
+      this.data.restaurants.push(seed);
     } else {
       const old = new Map(current.dishes.map((d) => [d.id, d]));
       const merged = seed.dishes.map((d) => {
@@ -101,7 +113,6 @@ export const db = {
       current.categories = [...cats.values()];
       current.seed = seed.seed;
     }
-    this.save();
   },
 };
 

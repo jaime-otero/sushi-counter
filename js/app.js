@@ -1,5 +1,5 @@
 import { db, uid, askPersistence } from './store.js';
-import { SEED_ID } from './seed.js';
+import { BUILTINS } from './seed.js';
 
 const APP_VERSION = '1.0.0';
 
@@ -245,6 +245,9 @@ function appbar({ title, jp = '', sub = '', back = '', brand = false, actions = 
   </div></header>`;
 }
 
+const EXTRA_LABEL = { aparte: 'Extra', noche: 'Libre solo noches' };
+const EXTRA_TEXT = { aparte: 'Fuera del buffet: se paga aparte', noche: 'Libre en cenas y fines de semana; a mediodía, aparte' };
+
 const RATE_WORDS = ['', 'Nunca más', 'Regular', 'Bien', 'Muy rico', 'Favorito'];
 
 function rateHTML(v, attrs) {
@@ -293,6 +296,7 @@ function dishMeta(d, s) {
   if (d.pieces) meta.push(`${d.pieces} ${d.pieces === 1 ? 'pz' : 'pzs'}`);
   if (d.supl) meta.push(`<i class="tag supl">+${eurShort(d.supl.eur)}${d.supl.from > 1 ? ' 2ª vez' : ''}</i>`);
   if (d.rec) meta.push('<i class="tag rec" lang="ja">おすすめ</i>');
+  if (d.extra) meta.push(`<i class="tag extra">${EXTRA_LABEL[d.extra]}</i>`);
   if (s?.avg != null) meta.push(`<span class="mini-score">${pipsRO(s.avg)}${f1(s.avg)}</span>`);
   if (d.note) meta.push('<span class="has-note">nota</span>');
   return meta.length ? `<span class="dish-meta">${meta.join('')}</span>` : '';
@@ -876,7 +880,7 @@ const isStandalone = () => navigator.standalone === true || matchMedia('(display
 
 function viewSettings() {
   const d = D();
-  const seedMissing = !rest(SEED_ID);
+  const seedMissing = Object.keys(BUILTINS).some((id) => !rest(id));
   return {
     tab: null,
     html: `${appbar({ back: '#/', title: 'Ajustes', jp: '設定' })}
@@ -906,9 +910,9 @@ function viewSettings() {
           </div>
         </section>
         <section class="card">
-          ${secTitle('品書き', 'Carta de Sushitokyo')}
-          <p class="muted small">${seedMissing ? 'La borraste. Puedes volver a cargarla.' : 'Recarga la carta original si has borrado platos por error. Se mantienen tus notas, tus platos añadidos y el historial.'}</p>
-          <button class="btn" data-act="restore-seed">${seedMissing ? 'Volver a cargar la carta' : 'Restaurar carta original'}</button>
+          ${secTitle('品書き', 'Cartas de Sushitokyo y SUMO')}
+          <p class="muted small">${seedMissing ? 'Has borrado alguna. Puedes volver a cargarla.' : 'Recarga las cartas originales si has borrado platos por error. Se mantienen tus notas, tus platos añadidos y el historial.'}</p>
+          <button class="btn" data-act="restore-seed">${seedMissing ? 'Volver a cargar las cartas' : 'Restaurar cartas originales'}</button>
         </section>
         <section class="card">
           ${secTitle('危険', 'Empezar de cero')}
@@ -976,6 +980,7 @@ function openDish(rid, did, mid) {
   const tags = [
     d.rec ? '<i class="tag rec"><span lang="ja">おすすめ</span> de la casa</i>' : '',
     d.supl ? `<i class="tag supl">Suplemento ${eurShort(d.supl.eur)}${d.supl.from > 1 ? ' a partir de la 2ª vez' : ''}</i>` : '',
+    d.extra ? `<i class="tag extra">${EXTRA_TEXT[d.extra]}</i>` : '',
   ].join('');
   const inMeal = m && (counts(m)[did] || m.ratings[did]);
   openSheet(`<div class="dish-sheet">
@@ -1408,8 +1413,8 @@ const actions = {
       </form>`);
   },
   'restore-seed': () => {
-    db.restoreSeed();
-    toast('Carta de Sushitokyo cargada');
+    db.restoreSeeds();
+    toast('Cartas originales cargadas');
     refresh();
   },
   'reset-all': () => {
@@ -1638,7 +1643,7 @@ function onboarding() {
   openSheet(`<div class="onboard">
     <p class="confirm-jp" lang="ja">いらっしゃいませ</p>
     <h2 class="sheet-title">Vuestro contador de sushi</h2>
-    <p class="muted">Contad cada pieza, puntuad cada plato y acordaos de lo que os gusta. Ya está cargada la carta de <b>Sushitokyo Príncipe Pío</b>; podéis añadir más restaurantes cuando queráis.</p>
+    <p class="muted">Contad cada pieza, puntuad cada plato y acordaos de lo que os gusta. Ya están cargadas las cartas de <b>Sushitokyo Príncipe Pío</b> y <b>SUMO</b>; podéis añadir más restaurantes cuando queráis.</p>
     <div class="grid2">
       <label class="field"><span><i class="dot a"></i>Tu nombre</span><input id="ob-a" value="${esc(N().a)}" autocomplete="off"></label>
       <label class="field"><span><i class="dot b"></i>Su nombre</span><input id="ob-b" value="${esc(N().b)}" autocomplete="off"></label>

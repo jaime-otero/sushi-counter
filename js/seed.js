@@ -2,6 +2,8 @@
 // Fuente: carta digital oficial enlazada desde sushitokyoprincipepio.com
 // (to-focus.com/restaurant_menu/sushitokyo_principe_menu, menú noche), consultada el 20/10/2026.
 
+import { SUMO_ID, SUMO_META, SUMO_CATEGORIES, SUMO_DISHES } from './seed-sumo.js';
+
 export const SEED_ID = 'sushitokyo-principe-pio';
 export const SEED_VERSION = 2;
 
@@ -214,24 +216,32 @@ function parseFlags(flags) {
     const m = x.match(/^([sx])(\d)$/);
     if (m) supl = { eur: Number(m[2]), from: m[1] === 's' ? 1 : 2 };
   }
-  return { rec: f.includes('r'), supl, notSushi: f.includes('n') };
+  const extra = f.includes('extra') ? 'aparte' : f.includes('noche') ? 'noche' : null;
+  return { rec: f.includes('r'), supl, extra, notSushi: f.includes('n'), forceSushi: f.includes('S') };
 }
 
-export function buildSushiTokyo() {
-  const categories = CATEGORIES.map(([id, name, jp, sushi]) => ({ id, name, jp, sushi }));
+function buildDishes(categories, data, prefix) {
   const dishes = [];
   for (const cat of categories) {
-    for (const [code, name, pieces, desc, flags] of DISHES[cat.id]) {
-      const { rec, supl, notSushi } = parseFlags(flags);
+    data[cat.id].forEach(([code, name, pieces, desc, flags], i) => {
+      const { rec, supl, extra, notSushi, forceSushi } = parseFlags(flags);
       dishes.push({
-        id: 'st' + code.toLowerCase(),
+        id: prefix + (code ? code.toLowerCase() : `-${cat.id}-${i + 1}`),
         code, name, desc, pieces,
         cat: cat.id,
-        sushi: cat.sushi && !notSushi,
+        sushi: (cat.sushi || forceSushi) && !notSushi,
         rec, supl, note: '',
+        ...(extra ? { extra } : {}),
       });
-    }
+    });
   }
+  return dishes;
+}
+
+const toCategories = (list) => list.map(([id, name, jp, sushi]) => ({ id, name, jp, sushi }));
+
+export function buildSushiTokyo() {
+  const categories = toCategories(CATEGORIES);
   return {
     id: SEED_ID,
     seed: { id: SEED_ID, version: SEED_VERSION },
@@ -248,11 +258,27 @@ export function buildSushiTokyo() {
     ],
     source: 'Carta oficial (to-focus.com), consultada el 20/10/2026',
     categories,
-    dishes,
+    dishes: buildDishes(categories, DISHES, 'st'),
     createdAt: Date.now(),
   };
 }
 
+export function buildSumo() {
+  const categories = toCategories(SUMO_CATEGORIES);
+  return {
+    id: SUMO_ID,
+    seed: { id: SUMO_ID, version: 1 },
+    ...SUMO_META,
+    prices: SUMO_META.prices.map((p) => ({ ...p })),
+    categories,
+    dishes: buildDishes(categories, SUMO_DISHES, 'sm'),
+    createdAt: Date.now(),
+  };
+}
+
+// Cartas que vienen con la app. Las nuevas se añaden solas a los datos ya guardados.
+export const BUILTINS = { [SEED_ID]: buildSushiTokyo, [SUMO_ID]: buildSumo };
+
 export function seedRestaurants() {
-  return [buildSushiTokyo()];
+  return Object.values(BUILTINS).map((build) => build());
 }

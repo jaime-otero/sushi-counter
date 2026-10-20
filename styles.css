@@ -383,6 +383,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--a
 }
 .tag.rec { color: var(--beni); background: var(--beni-soft); }
 .tag.supl { color: var(--kin); background: color-mix(in srgb, var(--kin) 14%, transparent); }
+.tag.extra { color: var(--pa); background: color-mix(in srgb, var(--pa) 13%, transparent); }
 .tag.debate { color: var(--pb); background: color-mix(in srgb, var(--pb) 14%, transparent); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tags .tag { font-size: 13px; padding: 3px 9px; }

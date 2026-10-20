@@ -18,7 +18,7 @@ def main(out_dir: str) -> None:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     css = (ROOT / "styles.css").read_text()
-    js = "\n".join(strip_module((ROOT / "js" / f).read_text()) for f in ("seed.js", "store.js", "app.js"))
+    js = "\n".join(strip_module((ROOT / "js" / f).read_text()) for f in ("seed-sumo.js", "seed.js", "store.js", "app.js"))
     body = (ROOT / "index.html").read_text()
     body = body[body.index("<body>") + len("<body>"):body.index("</body>")]
     html = (
